@@ -25,6 +25,9 @@ function GameScreen({ role, roomCode, playerId }) {
   const [eliminated, setEliminated] = useState(false);
   const [winner, setWinner] = useState(null);
 
+  // Scatter Timer
+  const [scatterTime, setScatterTime] = useState(10);
+
   // ======================
   // GPS STREAMING
   // ======================
@@ -75,14 +78,14 @@ function GameScreen({ role, roomCode, playerId }) {
       navigator.geolocation.clearWatch(watchId);
     };
 
-  },[roomCode,playerId]);
+  },[roomCode,playerId, scatterTime]);
 
   // ======================
   // CONTINUOUS LOCATION EMIT (1s Tick)
   // ======================
 
   useEffect(() => {
-    if (!selfLocation || !playerId || !roomCode) return;
+    if (scatterTime <= 0 || !selfLocation || !playerId || !roomCode) return;
 
     const interval = setInterval(() => {
       socket.emit("location_update", {
@@ -96,7 +99,17 @@ function GameScreen({ role, roomCode, playerId }) {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [roomCode, playerId, selfLocation]);
+  }, [roomCode, playerId, selfLocation, scatterTime]);
+
+  // ======================
+  // SCATTER COUNTDOWN
+  // ======================
+  useEffect(() => {
+    if (scatterTime > 0) {
+      const timer = setTimeout(() => setScatterTime(s => s - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [scatterTime]);
 
 
   // ======================
@@ -258,6 +271,9 @@ function GameScreen({ role, roomCode, playerId }) {
   const minutes = Math.floor(timeRemaining/60);
   const seconds = timeRemaining % 60;
 
+  // Radar logic check
+  const showRadar = role === "cypher" || (role === "demogorgon" && demogorgonRadar);
+
   // Check immunity
   const isImmune = immunityUntil && new Date() < immunityUntil;
 
@@ -324,12 +340,15 @@ function GameScreen({ role, roomCode, playerId }) {
           </div>
         )}
 
-        {/* Danger alert */}
+        {/* Danger alert (Cypher) */}
         {danger && role === "cypher" && !eliminated && phase === "running" && (
-          <div style={{
+          <div className="glitch" style={{
             marginTop:"20px",
             color:"red",
-            fontWeight:"bold"
+            fontWeight:"bold",
+            padding: "15px",
+            border: "2px solid red",
+            backgroundColor: "rgba(255,0,0,0.2)"
           }}>
             WARNING: DEMOGORGON ({danger.distance.toFixed(1)}m)
             <br />
@@ -337,42 +356,72 @@ function GameScreen({ role, roomCode, playerId }) {
           </div>
         )}
         
-        {/* Immunity / Mothergate */}
+        {/* CYPHER TASKS */}
         {role === "cypher" && !eliminated && phase === "running" && (
-          <div style={{ marginTop: "20px" }}>
-            {isImmune ? (
-               <div style={{ color: "cyan" }}>IMMUNE UNTIL SPRINT ENDS</div>
-            ) : (
-               <button className="menu-button" style={{ scale: 0.8 }} onClick={startMothergate}>
-                 OPEN MOTHERGATE SPRINT
-               </button>
-            )}
+          <div style={{ marginTop: "20px", padding: "10px", border: "1px solid cyan", borderRadius: "5px", textAlign: "left" }}>
+            <h3 style={{ margin: "0 0 10px 0", color: "cyan" }}>CYPHER TASKS</h3>
+            <ul style={{ margin: 0, paddingLeft: "20px", fontSize: "14px", color: "white" }}>
+              <li>Survive until the extraction timer runs out.</li>
+              <li>Avoid the Demogorgon captures.</li>
+              <li>Sprint through Mothergates for temporary immunity.</li>
+            </ul>
+            <div style={{ marginTop: "15px", textAlign: "center" }}>
+              {isImmune ? (
+                 <div style={{ color: "cyan", fontWeight: "bold", padding: "5px" }}>IMMUNITY ACTIVE</div>
+              ) : (
+                 <button className="menu-button" style={{ scale: 0.8 }} onClick={startMothergate}>
+                   OPEN MOTHERGATE SPRINT
+                 </button>
+              )}
+            </div>
           </div>
         )}
 
-
-        {/* Demogorgon radar window */}
-
+        {/* Demogorgon alert & alerts */}
         {role === "demogorgon" && demogorgonRadar && phase === "running" && (
-
-          <div style={{
+          <div className="glitch" style={{
             marginTop:"20px",
-            color:"#ff4444"
+            color:"#ff4444",
+            padding: "10px",
+            border: "2px solid #ff4444",
+            backgroundColor: "rgba(255,0,0,0.1)"
           }}>
-            RADAR ACTIVE
+            RADAR ACTIVE - HUNT THEM DOWN
           </div>
-
         )}
 
         {/* RADAR */}
-        {(!eliminated && phase === "running") && (
+        {(!eliminated && phase === "running") && showRadar && (
           <RadarCanvas
             players={radarData}
             self={selfLocation}
           />
         )}
+        
+        {(!eliminated && phase === "running") && role === "demogorgon" && !demogorgonRadar && (
+          <div style={{ marginTop: "30px", padding: "40px", border: "2px dashed #555", borderRadius: "50%", color: "#888" }}>
+             RADAR OFFLINE<br/>(Recharging)
+          </div>
+        )}
 
       </div>
+
+      {scatterTime > 0 && (
+        <div style={{
+          position: "fixed",
+          top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: "rgba(0,0,0,0.9)",
+          zIndex: 9999,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center"
+        }}>
+          <h1 className="glitch" style={{ color: "red", fontSize: "50px", marginBottom: "20px" }}>SCATTER!</h1>
+          <h2 style={{ color: "white", fontSize: "100px", margin: 0 }}>{scatterTime}</h2>
+          <p style={{ color: "gray", marginTop: "20px" }}>GET AWAY FROM EACH OTHER</p>
+        </div>
+      )}
 
     </div>
 
