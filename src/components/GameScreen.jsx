@@ -40,8 +40,6 @@ function GameScreen({ role, roomCode, playerId }) {
 
       (pos)=>{
 
-        if (eliminated || phase !== "running") return; // Reduce sending if not running
-
         const { latitude,longitude,speed } = pos.coords;
 
         setSelfLocation({
@@ -83,7 +81,7 @@ function GameScreen({ role, roomCode, playerId }) {
       navigator.geolocation.clearWatch(watchId);
     };
 
-  },[roomCode,playerId, eliminated, phase]);
+  },[roomCode,playerId]);
 
 
   // ======================
