@@ -89,6 +89,13 @@ function RadarCanvas({ players, self }) {
       ctx.arc(x, y, 5, 0, Math.PI * 2);
       ctx.fill();
 
+      // Draw player number on top of radar dot
+      ctx.fillStyle = "white";
+      ctx.font = "12px Orbitron, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(p.playerNumber, x, y - 12);
+
     });
 
   }, [players, self]);

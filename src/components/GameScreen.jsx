@@ -355,6 +355,26 @@ function GameScreen({ role, roomCode, playerId }) {
             CAPTURE IN: {danger.countdownRemaining.toFixed(1)}s
           </div>
         )}
+
+        {/* Danger alert (Demogorgon) */}
+        {danger && role === "demogorgon" && !eliminated && phase === "running" && (
+          <div className="glitch" style={{
+            marginTop:"20px",
+            color:"red",
+            fontWeight:"bold",
+            padding: "15px",
+            border: "2px solid red",
+            backgroundColor: "rgba(255,0,0,0.2)"
+          }}>
+             PREY IN RANGE ({danger.distance.toFixed(1)}m)
+            <br />
+            CONSUMING IN: {danger.countdownRemaining.toFixed(1)}s
+            <br />
+            <span style={{ fontSize: "14px", color: "pink", display: "inline-block", marginTop: "5px" }}>
+              STAY WITHIN 2-5m FOR 30s TO CAPTURE!
+            </span>
+          </div>
+        )}
         
         {/* CYPHER TASKS */}
         {role === "cypher" && !eliminated && phase === "running" && (
