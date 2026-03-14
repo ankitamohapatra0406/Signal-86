@@ -44,7 +44,8 @@ function GameScreen({ role, roomCode, playerId }) {
 
         setSelfLocation({
           latitude,
-          longitude
+          longitude,
+          speed: speed || 0
         });
 
         setAllPlayers(prev=>({
@@ -55,14 +56,7 @@ function GameScreen({ role, roomCode, playerId }) {
           }
         }));
 
-        socket.emit("location_update",{
-          roomCode,
-          playerId,
-          latitude,
-          longitude,
-          speed: speed || 0,
-          timestamp: Math.floor(Date.now()/1000)
-        });
+        // Emitting is now handled by a continuous 1-second interval below
 
       },
 
@@ -82,6 +76,27 @@ function GameScreen({ role, roomCode, playerId }) {
     };
 
   },[roomCode,playerId]);
+
+  // ======================
+  // CONTINUOUS LOCATION EMIT (1s Tick)
+  // ======================
+
+  useEffect(() => {
+    if (!selfLocation || !playerId || !roomCode) return;
+
+    const interval = setInterval(() => {
+      socket.emit("location_update", {
+        roomCode,
+        playerId,
+        latitude: selfLocation.latitude,
+        longitude: selfLocation.longitude,
+        speed: selfLocation.speed || 0,
+        timestamp: Math.floor(Date.now() / 1000)
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [roomCode, playerId, selfLocation]);
 
 
   // ======================
