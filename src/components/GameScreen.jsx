@@ -45,10 +45,21 @@ function GameScreen({ role, roomCode, playerId }) {
 
         const { latitude,longitude,speed } = pos.coords;
 
-        setSelfLocation({
-          latitude,
-          longitude,
-          speed: speed || 0
+        setSelfLocation(prev => {
+          if (!prev) {
+            return {
+              latitude,
+              longitude,
+              speed: speed || 0
+            };
+          }
+          // Exponential Moving Average to smooth GPS noise jumps
+          const alpha = 0.3; // smoothing factor
+          return {
+            latitude: prev.latitude * (1 - alpha) + latitude * alpha,
+            longitude: prev.longitude * (1 - alpha) + longitude * alpha,
+            speed: speed || 0
+          };
         });
 
         setAllPlayers(prev=>({
@@ -318,7 +329,7 @@ function GameScreen({ role, roomCode, playerId }) {
         {/* Voting UI */}
         {phase === "voting" && voteCandidates.length > 0 && !eliminated && (
           <div style={{ margin: "20px 0", padding: "10px", border: "1px solid yellow" }}>
-            <h3 style={{ color: "yellow" }}>VOTING PHASE</h3>
+            <h3 className="glitch" style={{ color: "yellow", marginBottom: "10px" }}>TERMINATION ROUND</h3>
             <p>Vote for a suspected Demogorgon! Time: {voteDuration}s</p>
             {voteCandidates.map(c => (
                <button 
@@ -377,7 +388,7 @@ function GameScreen({ role, roomCode, playerId }) {
         )}
         
         {/* CYPHER TASKS */}
-        {role === "cypher" && !eliminated && phase === "running" && (
+        {role === "cypher" && !eliminated && phase === "running" && timeRemaining > 600 && (
           <div style={{ marginTop: "20px", padding: "10px", border: "1px solid cyan", borderRadius: "5px", textAlign: "left" }}>
             <h3 style={{ margin: "0 0 10px 0", color: "cyan" }}>CYPHER TASKS</h3>
             <ul style={{ margin: 0, paddingLeft: "20px", fontSize: "14px", color: "white" }}>
