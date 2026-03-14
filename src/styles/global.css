@@ -1,0 +1,499 @@
+/* -----------------------------
+   GLOBAL RESET
+------------------------------ */
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+html,body{
+  height:100%;
+  width:100%;
+  background:black;
+  overflow:hidden;
+}
+
+/* -----------------------------
+   APP CONTAINER
+------------------------------ */
+
+.app-container{
+  position:relative;
+  height:100vh;
+  width:100vw;
+  overflow:hidden;
+}
+
+/* -----------------------------
+   BACKGROUND VIDEO
+------------------------------ */
+
+.bg-video{
+  position:absolute;
+  top:0;
+  left:0;
+
+  width:100%;
+  height:100%;
+
+  object-fit:cover;
+  z-index:1;
+}
+
+/* -----------------------------
+   TITLE BAR (SIGNAL 86)
+------------------------------ */
+
+.title-bar{
+
+  position:absolute;
+  top:40px;   /* increased from 20px */
+
+  left:50%;
+  transform:translateX(-50%);
+
+  font-family:"Benguiat", serif;
+
+  font-size:clamp(34px,6vw,80px);
+
+  letter-spacing:6px;
+
+  color:#ff2b2b;
+
+  text-shadow:
+    0 0 10px #ff0000,
+    0 0 20px #ff0000,
+    0 0 40px #ff0000,
+    0 0 80px #ff0000;
+
+  padding-top:env(safe-area-inset-top);
+
+  z-index:10;
+}
+
+/* -----------------------------
+   MAIN OVERLAY CONTENT
+------------------------------ */
+
+.overlay{
+  position:relative;
+  z-index:5;
+
+  height:100vh;
+  width:100%;
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  padding-left:20px;
+  padding-right:20px;
+}
+
+/* -----------------------------
+   MOBILE OPTIMIZATION
+------------------------------ */
+
+@media (max-width:600px){
+
+  .title-bar{
+
+    font-size:34px;
+    letter-spacing:3px;
+
+  }
+
+}
+
+/* -----------------------------
+   TABLET
+------------------------------ */
+
+@media (min-width:601px) and (max-width:1024px){
+
+  .title-bar{
+
+    font-size:50px;
+
+  }
+
+}
+
+/* -----------------------------
+   LARGE DESKTOP
+------------------------------ */
+
+@media (min-width:1400px){
+
+  .title-bar{
+
+    font-size:80px;
+
+  }
+
+}
+
+/* -----------------------------
+   CRT SCREEN EFFECT
+------------------------------ */
+
+.crt-overlay{
+  pointer-events:none;
+
+  position:absolute;
+  top:0;
+  left:0;
+
+  width:100%;
+  height:100%;
+
+  z-index:3;
+
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(0,0,0,0.15),
+      rgba(0,0,0,0.15) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+
+  animation:crtFlicker 6s infinite;
+}
+
+/* subtle flicker */
+
+@keyframes crtFlicker{
+
+  0%{opacity:0.08;}
+  50%{opacity:0.12;}
+  100%{opacity:0.08;}
+
+}
+
+/* -----------------------------
+   MENU BUTTONS
+------------------------------ */
+
+.menu-container{
+
+  display:flex;
+  flex-direction:column;
+  gap:24px;
+
+  width:100%;
+  max-width:300px;
+
+}
+
+/* button style */
+
+.menu-button{
+
+  font-family:"Orbitron", sans-serif;
+
+  font-size:18px;
+
+  padding:16px 24px;
+
+  background:transparent;
+
+  border:2px solid #ff2b2b;
+
+  color:#ff2b2b;
+
+  letter-spacing:2px;
+
+  cursor:pointer;
+
+  transition:all 0.25s ease;
+
+  box-shadow:
+    0 0 6px #ff0000,
+    inset 0 0 6px #ff0000;
+
+}
+
+/* hover effect */
+
+.menu-button:hover{
+
+  background:#ff2b2b;
+
+  color:black;
+
+  box-shadow:
+    0 0 12px #ff0000,
+    0 0 24px #ff0000;
+
+}
+
+/* press effect */
+
+.menu-button:active{
+
+  transform:scale(0.96);
+
+}
+
+/* -----------------------------
+   HAWKINS INTRO
+------------------------------ */
+
+.hawkins-container{
+
+  position:absolute;
+
+  top:0;
+  left:0;
+
+  width:100%;
+  height:100%;
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  background:black;
+
+  z-index:20;
+
+}
+
+.hawkins-text {
+  font-family: "Benguiat", serif;
+  color: #ff2b2b;
+  font-size: clamp(30px, 8vw, 60px);
+  text-align: center;
+  letter-spacing: 0.06em;           /* ← key change: use em instead of px */
+  text-shadow:
+    0 0 15px #ff0000,
+    0 0 30px #ff0000,
+    0 0 60px #ff0000,
+    0 0 100px #800000;              /* softer / staged glow layers */
+  animation: hawkinsReveal 2s ease-out;
+  padding: 0 10vw;                    /* ← prevents edge clipping on mobile */
+  white-space: nowrap;
+}
+@keyframes hawkinsReveal{
+
+  0%{
+    opacity:0;
+    filter:blur(12px);
+    transform:translateY(40px);
+  }
+
+  100%{
+    opacity:1;
+    filter:blur(0);
+    transform:translateY(0);
+  }
+
+}
+
+/* -----------------------------
+   HAWKINS RED LIGHT EFFECT
+------------------------------ */
+
+.hawkins-light{
+
+  position:absolute;
+
+  width:100%;
+  height:100%;
+
+  background: radial-gradient(
+    circle at center,
+    rgba(255,0,0,0.35) 0%,
+    rgba(255,0,0,0.15) 30%,
+    rgba(0,0,0,0.9) 70%
+  );
+
+  z-index:18;
+
+}
+
+/* -----------------------------
+   RED LIGHT SWEEP
+------------------------------ */
+
+.hawkins-sweep{
+  position:relative;
+  display:inline-block;
+  overflow:hidden;
+}
+
+.hawkins-sweep::after{
+
+  content:"";
+
+  position:absolute;
+  top:0;
+  left:-120%;
+
+  width:80%;
+  height:100%;
+
+  background:linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,0,0,0.8),
+    transparent
+  );
+
+  animation:lightSweep 2.5s ease-out;
+
+}
+
+@keyframes lightSweep{
+
+  0%{
+    left:-120%;
+  }
+
+  100%{
+    left:120%;
+  }
+
+}
+/* -----------------------------
+   ROOM SCREEN
+------------------------------ */
+
+.room-container{
+
+  width:100%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+}
+
+.room-box{
+
+  width:100%;
+  max-width:420px;
+
+  padding:30px;
+
+  border:2px solid #ff2b2b;
+
+  background:rgba(0,0,0,0.7);
+
+  box-shadow:
+    0 0 20px #ff0000,
+    inset 0 0 20px #ff0000;
+
+  text-align:center;
+
+}
+
+.room-title{
+
+  font-family:"Orbitron";
+
+  color:#ff2b2b;
+
+  font-size:22px;
+
+  margin-bottom:20px;
+
+}
+
+.room-code{
+
+  font-family:"Orbitron";
+
+  font-size:36px;
+
+  color:#ff2b2b;
+
+  letter-spacing:8px;
+
+  margin-bottom:15px;
+
+}
+
+.room-subtitle{
+
+  font-size:14px;
+
+  color:#aaa;
+
+  margin-bottom:30px;
+
+}
+
+.players-list{
+
+  margin-bottom:20px;
+
+}
+
+.player-item{
+
+  padding:10px;
+
+  border-bottom:1px solid rgba(255,0,0,0.3);
+
+}
+
+.room-status{
+
+  margin-top:20px;
+
+  font-size:14px;
+
+  color:#ff2b2b;
+
+}
+
+/* -----------------------------
+   ROOM CODE INPUTS
+------------------------------ */
+
+.code-inputs{
+
+  display:flex;
+  justify-content:center;
+
+  gap:12px;
+
+  margin-bottom:25px;
+
+}
+
+.code-input{
+
+  width:55px;
+  height:60px;
+
+  text-align:center;
+
+  font-size:26px;
+
+  font-family:"Orbitron";
+
+  background:black;
+
+  border:2px solid #ff2b2b;
+
+  color:#ff2b2b;
+
+  outline:none;
+
+  box-shadow:
+    0 0 10px #ff0000,
+    inset 0 0 10px #ff0000;
+
+}
+
+.code-input:focus{
+
+  box-shadow:
+    0 0 20px #ff0000,
+    inset 0 0 10px #ff0000;
+
+}
